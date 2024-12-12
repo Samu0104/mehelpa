@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finalizar Compra</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Open+Sans&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            padding: 20px;
+        }
+        h1 {
+            font-family: 'Playfair Display', serif;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <h1>Finalizar Compra</h1>
+    <div id="carrinho">
+        <h2>Itens no Carrinho</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Preço</th>
+                    <th>Tipo</th>
+                </tr>
+            </thead>
+            <tbody id="carrinho-itens">
+                <!-- Os itens do carrinho serão inseridos aqui -->
+            </tbody>
+        </table>
+        <p><strong>Total:</strong> R$ <span id="total-compra">0.00</span></p>
+        <button onclick="finalizarCompra()">Confirmar Compra</button>
+    </div>
+
+    <script>
+        async function carregarCarrinho() {
+            try {
+                const response = await fetch('/carrinho');
+                if (response.ok) {
+                    const itens = await response.json();
+                    const tbody = document.getElementById('carrinho-itens');
+                    let total = 0;
+
+                    tbody.innerHTML = ''; // Limpa a tabela antes de inserir os itens
+                    itens.forEach(item => {
+                        total += item.preco;
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${item.nome}</td>
+                            <td>R$ ${item.preco.toFixed(2)}</td>
+                            <td>${item.tipo}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+
+                    document.getElementById('total-compra').textContent = total.toFixed(2);
+                } else {
+                    alert('Erro ao carregar o carrinho.');
+                }
+            } catch (error) {
+                alert('Erro ao se conectar com o servidor.');
+            }
+        }
+
+        async function finalizarCompra() {
+            try {
+                const response = await fetch('/compra', {
+                    method: 'POST',
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    alert(`Compra finalizada com sucesso! Total: R$${data.total.toFixed(2)}`);
+                    window.location.href = '/confirmacao';
+                } else {
+                    const data = await response.json();
+                    alert(`Erro: ${data.message}`);
+                }
+            } catch (error) {
+                alert('Erro ao finalizar a compra. Tente novamente.');
+            }
+        }
+
+        // Carrega os itens no carrinho ao abrir a página
+        carregarCarrinho();
+    </script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Perfil</title>
+</head>
+<body>
+    <h1>Bem-vindo, {{ user['Nome'] }}!</h1>
+    <p>Email: {{ user['email'] }}</p>
+    <p>Idade: {{ user['idade'] }}</p>
+    <p>Telefone: {{ user['telefone'] }}</p>
+    
+    <a href="/logout">Sair</a>
+</body>
+</html>
